@@ -9,6 +9,6 @@ import school.cactus.succulentshop.infra.snackbar.SnackbarState
 abstract class BaseViewModel : ViewModel() {
     val navigation = Navigation()
 
-    protected val _snackbarState = MutableLiveData<SnackbarState>()
-    val snackbarState: LiveData<SnackbarState> = _snackbarState
+    protected val _snackbarStateData = MutableLiveData<SnackbarState>()
+    val snackbarState: LiveData<SnackbarState> = _snackbarStateData
 }

@@ -5,7 +5,7 @@
 
         <variable
             name="viewModel"
-            type="school.cactus.succulentshop.login.LoginViewModel" />
+            type="school.cactus.succulentshop.signup.SignupViewModel" />
     </data>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -13,62 +13,80 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".login.LoginFragment"
-        tools:viewBindingIgnore="true"
-        android:orientation="vertical"
-        android:padding="16dp">
+        tools:context=".signup.SignupFragment"
+        android:padding="16dp"
+        android:orientation="vertical">
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/outlinedTextFieldemail"
+            android:id="@+id/outlinedTextFieldSignUpemail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/email_username"
-            android:layout_marginBottom="16dp"
+            android:hint="@string/write_email"
             error="@{viewModel.identifierErrorMessage}"
+            android:layout_marginBottom="16dp"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edttextEmail"
+                android:id="@+id/edttextSignUpEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:maxLines="1"
-                android:text="@={viewModel.identifier}" />
+                android:text="@={viewModel.identifier}"
+                android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/outlinedTextFieldpassword"
+            android:id="@+id/outlinedTextFieldSignUpusername"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/write_username"
+            error="@{viewModel.usernameErrorMessage}"
+            android:layout_marginBottom="16dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edttextSignUpusername"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@={viewModel.username}"
+                android:maxLines="1"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/outlinedTextFieldSignuppassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/password"
+            error="@{viewModel.passwordErrorMessage}"
             app:endIconMode="password_toggle"
             android:layout_marginBottom="16dp"
-            error="@{viewModel.passwordErrorMessage}"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edttextPassword"
+                android:id="@+id/edttextSignupPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"
+                android:text="@={viewModel.password}"
                 android:maxLines="1"
-                android:text="@={viewModel.password}" />
+                />
         </com.google.android.material.textfield.TextInputLayout>
 
         <Button
-            android:id="@+id/loginButton"
+            android:id="@+id/signupButton"
             android:layout_width="match_parent"
             android:layout_height="64dp"
-            android:text="@string/log_in"
-            android:onClick="@{(view) -> viewModel.onLoginButtonClicked(view)}"
+            android:text="@string/sign_up"
+            android:onClick="@{(view) -> viewModel.onSignupButtonClicked(view)}"
             />
 
         <Button
-            android:id="@+id/createAccountButton"
+            android:id="@+id/alreadyHaveAccountButton"
             android:layout_width="match_parent"
             android:layout_height="64dp"
             android:hint="@string/create_an_account"
-            android:onClick="@{() -> viewModel.createAccountBtnClick()}"
-            android:text="Create an account"
+            android:text="@string/already_have_an_account"
+            android:onClick="@{() -> viewModel.haveAnAccountBtnClicked()}"
             style="@style/Widget.MaterialComponents.Button.TextButton" />
     </LinearLayout>
 </layout>

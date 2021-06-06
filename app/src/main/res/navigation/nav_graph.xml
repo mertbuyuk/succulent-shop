@@ -1,40 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
     app:startDestination="@id/loginFragment">
 
     <fragment
         android:id="@+id/loginFragment"
         android:name="school.cactus.succulentshop.login.LoginFragment"
-        android:label="LoginFragment">
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_login"
+        >
         <action
-            android:id="@+id/loginSuccessful"
+            android:id="@+id/action_loginFragment_to_productListFragment"
             app:destination="@id/productListFragment"
-            app:popUpTo="@id/nav_graph" />
+            app:popUpTo="@id/nav_graph"
+            />
+        <action
+            android:id="@+id/action_loginFragment_to_signupFragment"
+            app:destination="@id/signupFragment"
+            />
     </fragment>
-
+    <fragment
+        android:id="@+id/signupFragment"
+        android:name="school.cactus.succulentshop.signup.SignupFragment"
+        android:label="fragment_signup"
+        tools:layout="@layout/fragment_signup" >
+        <action
+            android:id="@+id/action_signupFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/nav_graph"/>
+        <action
+            android:id="@+id/action_signupFragment_to_productListFragment"
+            app:destination="@id/productListFragment"
+            app:popUpTo="@id/nav_graph"/>
+    </fragment>
     <fragment
         android:id="@+id/productListFragment"
         android:name="school.cactus.succulentshop.product.list.ProductListFragment"
-        android:label="ProductListFragment">
+        android:label="fragment_productlist"
+        tools:layout="@layout/fragment_product_list">
         <action
-            android:id="@+id/openProductDetail"
-            app:destination="@id/productDetailFragment" />
-    </fragment>
+            android:id="@+id/action_productListFragment_to_productDetailFragment"
+            app:destination="@id/productDetailFragment" >
+        </action>
+        <action
+            android:id="@+id/action_productListFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/nav_graph"/>
 
+    </fragment>
     <fragment
         android:id="@+id/productDetailFragment"
         android:name="school.cactus.succulentshop.product.detail.ProductDetailFragment"
-        android:label="ProductDetailFragment">
+        android:label="fragment_product_detail"
+        tools:layout="@layout/fragment_product_detail" >
+        <action
+            android:id="@+id/action_productDetailFragment_self"
+            app:destination="@id/productDetailFragment" />
         <argument
             android:name="productId"
+            app:argType="integer"
             android:defaultValue="-1"
-            app:argType="integer" />
+            />
+        <action
+            android:id="@+id/action_productDetailFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
     </fragment>
-
-    <action
-        android:id="@+id/tokenExpired"
-        app:destination="@id/loginFragment"
-        app:popUpTo="@id/nav_graph" />
 </navigation>

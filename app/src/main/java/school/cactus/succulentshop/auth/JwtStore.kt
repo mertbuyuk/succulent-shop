@@ -6,16 +6,20 @@ import androidx.core.content.edit
 
 class JwtStore(context: Context) {
 
-    private val prefs = context.getSharedPreferences(PREFS_FILE_NAME, MODE_PRIVATE)
+    val prefs = context.getSharedPreferences(PREFS_FILE_NAME, MODE_PRIVATE)
 
-    fun saveJwt(jwt: String) = prefs.edit(commit = true) {
-        putString(PREFS_KEY_JWT, jwt)
+    fun save(jwt: String) {
+        prefs.edit {
+            putString(PREFS_KEY_JWT, jwt).commit()
+        }
     }
 
     fun loadJwt(): String? = prefs.getString(PREFS_KEY_JWT, null)
 
-    fun deleteJwt() = prefs.edit(commit = true) {
-        remove(PREFS_KEY_JWT)
+    fun delete() {
+        prefs.edit(commit = true) {
+            remove(PREFS_KEY_JWT)
+        }
     }
 
     companion object {

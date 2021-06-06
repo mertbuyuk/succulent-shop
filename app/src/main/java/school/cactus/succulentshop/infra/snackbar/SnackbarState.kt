@@ -3,7 +3,7 @@ package school.cactus.succulentshop.infra.snackbar
 data class SnackbarState(
     val error: String? = null,
     val errorRes: Int? = null,
-    val duration: Int,
+    val length: Int,
     val action: SnackbarAction? = null
 ) {
     init {

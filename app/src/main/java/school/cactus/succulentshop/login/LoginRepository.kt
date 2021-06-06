@@ -6,15 +6,11 @@ import okhttp3.ResponseBody
 import school.cactus.succulentshop.api.GenericErrorResponse
 import school.cactus.succulentshop.api.api
 import school.cactus.succulentshop.api.login.LoginRequest
-import school.cactus.succulentshop.login.LoginRepository.LoginResult.ClientError
-import school.cactus.succulentshop.login.LoginRepository.LoginResult.Failure
-import school.cactus.succulentshop.login.LoginRepository.LoginResult.Success
-import school.cactus.succulentshop.login.LoginRepository.LoginResult.UnexpectedError
 
 class LoginRepository {
     suspend fun sendLoginRequest(
         identifier: String,
-        password: String
+        password: String,
     ): LoginResult {
         val request = LoginRequest(identifier, password)
 
@@ -25,12 +21,15 @@ class LoginRepository {
         }
 
         return when (response?.code()) {
-            null -> Failure
-            200 -> Success(response.body()!!.jwt)
-            in 400..499 -> ClientError(response.errorBody()!!.errorMessage())
-            else -> UnexpectedError
+            null -> LoginResult.Failure
+            200 -> LoginResult.Success(response.body()!!.jwt)
+            in 400..499 -> LoginResult.ClientError(response.errorBody()!!.errorMessage())
+            else -> LoginResult.UnexpectedError
+
         }
+
     }
+
 
     private fun ResponseBody.errorMessage(): String {
         val errorBody = string()

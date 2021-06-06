@@ -1,13 +1,15 @@
 package school.cactus.succulentshop.login
 
+import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
-import com.google.android.material.snackbar.Snackbar.LENGTH_INDEFINITE
+import com.google.android.material.snackbar.Snackbar
+import com.google.gson.JsonSyntaxException
 import kotlinx.coroutines.launch
 import school.cactus.succulentshop.R
 import school.cactus.succulentshop.auth.JwtStore
+import school.cactus.succulentshop.hideKeyboard
 import school.cactus.succulentshop.infra.BaseViewModel
 import school.cactus.succulentshop.infra.snackbar.SnackbarAction
 import school.cactus.succulentshop.infra.snackbar.SnackbarState
@@ -35,8 +37,16 @@ class LoginViewModel(
     val identifierErrorMessage: LiveData<Int> = _identifierErrorMessage
     val passwordErrorMessage: LiveData<Int> = _passwordErrorMessage
 
-    fun onLoginButtonClick() = viewModelScope.launch {
+    init {
+        if (store.loadJwt() != null) {
+            navigateToList()
+        }
+    }
+
+    fun onLoginButtonClicked(view: View) = viewModelScope.launch {
         if (isIdentifierValid() and isPasswordValid()) {
+            view.hideKeyboard()
+
             val result =
                 repository.sendLoginRequest(identifier.value.orEmpty(), password.value.orEmpty())
 
@@ -44,43 +54,51 @@ class LoginViewModel(
                 is Success -> onSuccess(result.jwt)
                 is ClientError -> onClientError(result.errorMessage)
                 UnexpectedError -> onUnexpectedError()
-                Failure -> onFailure()
+                Failure -> onFailure(view)
             }
         }
     }
 
     private fun onSuccess(jwt: String) {
-        store.saveJwt(jwt)
-
-        val directions = LoginFragmentDirections.loginSuccessful()
-        navigation.navigate(directions)
+        navigateToList()
+        store.save(jwt)
     }
 
     private fun onClientError(errorMessage: String) {
-        _snackbarState.value = SnackbarState(
-            error = errorMessage,
-            duration = LENGTH_LONG
-        )
+        if (errorMessage == null) return onUnexpectedError()
+
+        try {
+            _snackbarStateData.value = SnackbarState(
+                error = errorMessage,
+                length = Snackbar.LENGTH_LONG,
+            )
+        } catch (ex: JsonSyntaxException) {
+            onUnexpectedError()
+        }
     }
 
     private fun onUnexpectedError() {
-        _snackbarState.value = SnackbarState(
-            errorRes = R.string.unexpected_error_occurred,
-            duration = LENGTH_LONG
+        _snackbarStateData.value = SnackbarState(
+            errorRes = R.string.unexpected_error,
+            length = Snackbar.LENGTH_LONG,
         )
     }
 
-    private fun onFailure() {
-        _snackbarState.value = SnackbarState(
-            errorRes = R.string.check_your_connection,
-            duration = LENGTH_INDEFINITE,
+    private fun onFailure(view: View) {
+        _snackbarStateData.value = SnackbarState(
+            errorRes = R.string.onFailure,
+            length = Snackbar.LENGTH_INDEFINITE,
             action = SnackbarAction(
                 text = R.string.retry,
                 action = {
-                    onLoginButtonClick()
+                    onLoginButtonClicked(view)
                 }
             )
         )
+    }
+
+    fun createAccountBtnClick() {
+        navigation.navigate(LoginFragmentDirections.actionLoginFragmentToSignupFragment())
     }
 
     private fun isIdentifierValid(): Boolean {
@@ -91,5 +109,11 @@ class LoginViewModel(
     private fun isPasswordValid(): Boolean {
         _passwordErrorMessage.value = passwordValidator.validate(password.value.orEmpty())
         return _passwordErrorMessage.value == null
+    }
+
+    private fun navigateToList() {
+        val directions =
+            LoginFragmentDirections.actionLoginFragmentToProductListFragment()
+        navigation.navigate(directions)
     }
 }

@@ -1,4 +1,4 @@
-package school.cactus.succulentshop.login
+package school.cactus.succulentshop.signup
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,17 +6,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import school.cactus.succulentshop.auth.JwtStore
-import school.cactus.succulentshop.databinding.FragmentLoginBinding
+import school.cactus.succulentshop.databinding.FragmentSignupBinding
 import school.cactus.succulentshop.infra.BaseFragment
 
-class LoginFragment : BaseFragment() {
-    private var _binding: FragmentLoginBinding? = null
+
+class SignupFragment : BaseFragment() {
+    private var _binding: FragmentSignupBinding? = null
     private val binding get() = _binding!!
 
-    override val viewModel: LoginViewModel by viewModels {
-        LoginViewModelFactory(
+    override val viewModel: SignupViewModel by viewModels {
+        SignupViewModelFactory(
             store = JwtStore(requireContext()),
-            repository = LoginRepository()
+            repository = SignupRepository()
         )
     }
 
@@ -24,9 +25,9 @@ class LoginFragment : BaseFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = FragmentLoginBinding.inflate(inflater, container, false)
-        binding.lifecycleOwner = viewLifecycleOwner
+        _binding = FragmentSignupBinding.inflate(inflater, container, false)
         binding.viewModel = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
         return binding.root
     }
 

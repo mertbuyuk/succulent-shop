@@ -1,33 +1,33 @@
-package school.cactus.succulentshop.product.list
+package school.cactus.succulentshop.product.detail.related
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import school.cactus.succulentshop.databinding.ItemProductBinding
+import school.cactus.succulentshop.databinding.DetailItemReleatedproductBinding
 import school.cactus.succulentshop.product.ProductItem
-import school.cactus.succulentshop.product.list.ProductAdapter.ProductHolder
 
-class ProductAdapter : ListAdapter<ProductItem, ProductHolder>(DIFF_CALLBACK) {
 
+class RelatedProductAdapter :
+    ListAdapter<ProductItem, RelatedProductAdapter.ProductDetailHolder>(DIFF_CALLBACK) {
     var itemClickListener: (ProductItem) -> Unit = {}
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductHolder {
-        val binding = ItemProductBinding.inflate(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductDetailHolder {
+        val binding = DetailItemReleatedproductBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
             false
         )
 
-        return ProductHolder(binding, itemClickListener)
+        return ProductDetailHolder(binding, itemClickListener)
     }
 
-    override fun onBindViewHolder(holder: ProductHolder, position: Int) =
+    override fun onBindViewHolder(holder: ProductDetailHolder, position: Int) =
         holder.bind(getItem(position))
 
-    class ProductHolder(
-        private val binding: ItemProductBinding,
+    class ProductDetailHolder(
+        private val binding: DetailItemReleatedproductBinding,
         private val itemClickListener: (ProductItem) -> Unit
     ) :
         RecyclerView.ViewHolder(binding.root) {
@@ -50,4 +50,7 @@ class ProductAdapter : ListAdapter<ProductItem, ProductHolder>(DIFF_CALLBACK) {
                 oldItem == newItem
         }
     }
+
+
 }
+

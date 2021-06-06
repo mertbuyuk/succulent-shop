@@ -15,24 +15,42 @@ import school.cactus.succulentshop.product.detail.ProductDetailRepository.Produc
 import school.cactus.succulentshop.product.detail.ProductDetailRepository.ProductResult.Success
 import school.cactus.succulentshop.product.detail.ProductDetailRepository.ProductResult.TokenExpired
 import school.cactus.succulentshop.product.detail.ProductDetailRepository.ProductResult.UnexpectedError
-import school.cactus.succulentshop.product.list.ProductListFragmentDirections
+import school.cactus.succulentshop.product.detail.ProductDetailRepository.RelatedResult.RelatedFailure
+import school.cactus.succulentshop.product.detail.ProductDetailRepository.RelatedResult.RelatedProggresBar
+import school.cactus.succulentshop.product.detail.ProductDetailRepository.RelatedResult.RelatedSuccess
+import school.cactus.succulentshop.product.detail.ProductDetailRepository.RelatedResult.RelatedTokenExpired
+import school.cactus.succulentshop.product.detail.ProductDetailRepository.RelatedResult.RelatedUnexpectedError
 
 class ProductDetailViewModel(
     private val productId: Int,
     private val repository: ProductDetailRepository
 ) : BaseViewModel() {
 
-    private val _product = MutableLiveData<ProductItem>()
-    val product: LiveData<ProductItem> = _product
+    private val _product = MutableLiveData<ProductItem?>()
+    val product: LiveData<ProductItem?> = _product
+
+    private val _products = MutableLiveData<List<ProductItem?>>()
+    val products: LiveData<List<ProductItem?>> = _products
+
+    private val _isVisible = MutableLiveData<Boolean>()
+    val isVisible: LiveData<Boolean> = _isVisible
+
+    val itemClickListener: (ProductItem) -> Unit = {
+        val action =
+            ProductDetailFragmentDirections.actionProductDetailFragmentSelf(it.id)
+        navigation.navigate(action)
+    }
 
     init {
         fetchProduct()
+        fetchRelatedProducts()
     }
 
     private fun fetchProduct() = viewModelScope.launch {
-        repository.fetchProductDetail(productId).collect {
+        repository.fetchProduct(productId).collect {
             when (it) {
-                is Success -> onSuccess(it.product)
+                ProductDetailRepository.ProductResult.IsLoading -> _isVisible.value = true
+                is Success -> onSucces(it.product)
                 TokenExpired -> onTokenExpired()
                 UnexpectedError -> onUnexpectedError()
                 Failure -> onFailure()
@@ -40,14 +58,45 @@ class ProductDetailViewModel(
         }
     }
 
-    private fun onSuccess(product: ProductItem) {
+    fun fetchRelatedProducts() = viewModelScope.launch {
+        repository.fetchRelatedProduct(productId).collect {
+            when (it) {
+                RelatedProggresBar -> _isVisible.value = true
+                is RelatedSuccess -> onRelatedSucces(it.product)
+                RelatedTokenExpired -> onTokenExpired()
+                RelatedUnexpectedError -> onUnexpectedError()
+                RelatedFailure -> onRelatedFail()
+            }
+        }
+    }
+
+    private fun onRelatedFail() {
+        _snackbarStateData.value = SnackbarState(
+            errorRes = R.string.check_your_connection,
+            length = Snackbar.LENGTH_INDEFINITE,
+            action = SnackbarAction(
+                text = R.string.retry,
+                action = {
+                    fetchRelatedProducts()
+                }
+            )
+        )
+    }
+
+    private fun onRelatedSucces(product: List<ProductItem>?) {
+        _products.value = product.orEmpty()
+        _isVisible.value = false
+    }
+
+    private fun onSucces(product: ProductItem) {
         _product.value = product
+        _isVisible.value = false
     }
 
     private fun onTokenExpired() {
-        _snackbarState.value = SnackbarState(
+        _snackbarStateData.value = SnackbarState(
             errorRes = R.string.your_session_is_expired,
-            duration = Snackbar.LENGTH_INDEFINITE,
+            length = Snackbar.LENGTH_INDEFINITE,
             action = SnackbarAction(
                 text = R.string.log_in,
                 action = {
@@ -58,16 +107,16 @@ class ProductDetailViewModel(
     }
 
     private fun onUnexpectedError() {
-        _snackbarState.value = SnackbarState(
-            errorRes = R.string.unexpected_error_occurred,
-            duration = Snackbar.LENGTH_LONG,
+        _snackbarStateData.value = SnackbarState(
+            errorRes = R.string.unexpected_error,
+            length = Snackbar.LENGTH_LONG,
         )
     }
 
     private fun onFailure() {
-        _snackbarState.value = SnackbarState(
+        _snackbarStateData.value = SnackbarState(
             errorRes = R.string.check_your_connection,
-            duration = Snackbar.LENGTH_INDEFINITE,
+            length = Snackbar.LENGTH_INDEFINITE,
             action = SnackbarAction(
                 text = R.string.retry,
                 action = {
@@ -77,8 +126,6 @@ class ProductDetailViewModel(
         )
     }
 
-    private fun navigateToLogin() {
-        val directions = ProductListFragmentDirections.tokenExpired()
-        navigation.navigate(directions)
-    }
+    private fun navigateToLogin() =
+        navigation.navigate(ProductDetailFragmentDirections.actionProductDetailFragmentToLoginFragment())
 }
